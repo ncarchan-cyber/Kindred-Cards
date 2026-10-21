@@ -1,5 +1,5 @@
 // Kindred Cards offline cache. The version changes on every build so phones pick up updates.
-const CACHE = "kindred-58716a6a59";
+const CACHE = "kindred-7bcad77c7f";
 const CORE = ["./", "./index.html", "./icon.png", "./icon-512.png", "./manifest.webmanifest"];
 
 self.addEventListener("install", e => {
