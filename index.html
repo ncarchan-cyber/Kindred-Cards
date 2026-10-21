@@ -1,0 +1,1329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kindred Cards</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Kindred">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#5b89e6">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<style>
+/* Layout: a cornflower card table. Score strip, then Moves ribbon left + waste fan and deck right,
+   then four slot wells, then four tableau columns. One committed look, so no dark variant. */
+:root {
+  color-scheme: light;
+  --table-top: #5b89e6;
+  --table-bot: #79a3f0;
+  --well: rgba(22, 48, 138, 0.26);
+  --well-line: rgba(255, 255, 255, 0.34);
+  --on-table: #ffffff;
+  --card: #fffbf5;
+  --frame: #f0e3d4;
+  --ink: #4b2238;
+  --ink-soft: #9b7b89;
+  --pink: #ef5f9d;
+  --pink-deep: #c83a79;
+  --pink-soft: #fbc3db;
+  --back-a: #f27ab0;
+  --back-b: #f8a3c8;
+  --gold: #f7c544;
+  --gold-deep: #c88d10;
+  --navy: #1d3376;
+  --check: #3f6ee0;
+  --low: #d0103a;
+  --hot: #fff36b;
+  --scrim: rgba(18, 30, 84, 0.5);
+  --shade: rgba(20, 36, 100, 0.28);
+  --f-game: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
+  --f-text: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --cw: 82px;
+  --ch: 113px;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--table-bot); }
+body {
+  min-height: 100vh;
+  background: var(--table-top) linear-gradient(180deg, var(--table-top), var(--table-bot) 600px, var(--table-bot)) no-repeat;
+  color: var(--on-table);
+  font-family: var(--f-game);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+.app {
+  max-width: 520px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 10px 110px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Score strip */
+.top { display: flex; align-items: center; gap: 10px; }
+.iconbtn {
+  width: 44px; height: 44px; border-radius: 12px; border: 0; flex: none; cursor: pointer;
+  background: transparent; color: var(--on-table); display: grid; place-items: center;
+}
+.iconbtn svg { width: 28px; height: 28px; }
+.coins {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--navy); border-radius: 999px; padding: 4px 14px 4px 4px;
+  font-weight: 600; font-size: 19px; font-variant-numeric: tabular-nums; letter-spacing: 0.02em;
+}
+.coin {
+  width: 30px; height: 30px; border-radius: 50%; flex: none;
+  background: radial-gradient(circle at 36% 30%, #fff6cf 0 14%, var(--gold) 15% 64%, var(--gold-deep) 65%);
+  box-shadow: inset 0 0 0 2px var(--gold-deep);
+}
+.coin.big { width: 40px; height: 40px; }
+.progress { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.lvl { font-size: 13px; font-weight: 500; opacity: 0.9; }
+.lvl b { font-weight: 700; }
+.pips { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; max-width: 190px; }
+.pip { width: 18px; height: 18px; border-radius: 4px; background: var(--well); display: grid; place-items: center; }
+.pip.on { background: #ffffff; box-shadow: inset 0 0 0 2px var(--check); }
+.pip.on svg { width: 12px; height: 12px; }
+
+/* Moves ribbon + deck */
+.row2 { display: flex; align-items: flex-start; gap: 10px; }
+.ribbon {
+  width: var(--cw); height: calc(var(--ch) * 0.98); flex: none;
+  background: var(--pink-soft); color: var(--ink);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 86%, 0 100%);
+  border-radius: 6px 6px 0 0;
+  display: flex; flex-direction: column; align-items: center; padding-top: 8px; gap: 2px;
+}
+.ribbon span { font-size: 15px; font-weight: 600; border-bottom: 2px solid rgba(75, 34, 56, 0.25); padding-bottom: 2px; width: 74%; text-align: center; }
+.ribbon b { font-size: calc(var(--cw) * 0.42); font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.ribbon.low b { color: var(--low); }
+.deckzone { margin-left: auto; display: flex; align-items: flex-start; gap: 10px; }
+.fan { position: relative; height: var(--ch); width: calc(var(--cw) + var(--cw) * 0.56); }
+.fan .fc { position: absolute; top: 0; width: var(--cw); }
+.stock { width: var(--cw); height: var(--ch); flex: none; position: relative; cursor: pointer; }
+
+/* Wells */
+.slots { margin-top: 8px; }
+.grid4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.well {
+  width: 100%; height: var(--ch); border-radius: 12px; background: var(--well);
+  display: grid; place-items: center; color: var(--well-line);
+}
+.well svg { width: 52%; height: auto; }
+.slots .cell { position: relative; }
+.tableau { align-items: start; }
+.col { position: relative; min-height: var(--ch); }
+.pos { position: absolute; left: 0; right: 0; }
+
+/* Cards */
+.card {
+  position: relative; width: 100%; height: var(--ch);
+  border-radius: 12px; background: var(--card); color: var(--ink);
+  box-shadow: 0 3px 0 var(--shade), 0 0 0 1px rgba(75, 34, 56, 0.08);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 8px 6px;
+  font-weight: 600; font-size: clamp(13px, calc(var(--cw) * 0.18), 18px); line-height: 1.12;
+  overflow-wrap: break-word; hyphens: auto; -webkit-hyphens: auto;
+  touch-action: none; cursor: grab;
+}
+.card .w { display: block; max-width: 100%; }
+.card.pic { gap: 4px; }
+.card .em { font-size: calc(var(--cw) * 0.44); line-height: 1; font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; }
+.card .cap { font-size: 11px !important; font-weight: 500; color: var(--ink-soft); }
+.card::after { content: ""; position: absolute; inset: 5px; border-radius: 8px; border: 2px solid var(--frame); pointer-events: none; }
+.card.under { justify-content: flex-start; padding-top: 5px; }
+.card.under .w { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; font-size: 0.88em; color: var(--ink); }
+.card.under::after { display: none; }
+
+/* Set (base) cards: pink frame + tiara */
+.card.base { box-shadow: 0 3px 0 var(--shade), inset 0 0 0 4px var(--pink); }
+.card.base::after { inset: 7px; border-color: var(--pink-soft); }
+.card.base .tiara { position: absolute; left: 9px; top: 8px; width: 28%; color: var(--pink-deep); }
+.card.base .cnt { position: absolute; right: 10px; top: 8px; font-size: 13px; font-weight: 600; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.card.base .w { margin-top: 10px; text-wrap: balance; font-weight: 700; }
+.card.base.full { box-shadow: 0 3px 0 var(--shade), inset 0 0 0 4px var(--gold); }
+.card.base.full .cnt { color: var(--gold-deep); }
+
+/* Backs */
+.card.down {
+  cursor: default;
+  background:
+    linear-gradient(45deg, var(--back-a) 25%, transparent 25% 75%, var(--back-a) 75%),
+    linear-gradient(45deg, var(--back-a) 25%, transparent 25% 75%, var(--back-a) 75%) 9px 9px,
+    var(--back-b);
+  background-size: 18px 18px, 18px 18px, auto;
+  box-shadow: 0 3px 0 var(--shade), inset 0 0 0 4px #ffffff;
+}
+.card.down::after { display: none; }
+.stock .card.down { cursor: pointer; }
+.stock .badge {
+  position: absolute; top: 6px; right: 6px; background: #ffffff; color: var(--navy);
+  font-size: 14px; font-weight: 700; border-radius: 8px; padding: 1px 7px; font-variant-numeric: tabular-nums;
+}
+.stock .well.recycle { cursor: pointer; }
+.stock .well svg { width: 46%; }
+
+/* Waste strips (older cards peeking right) */
+.card.strip { justify-content: flex-start; align-items: flex-end; padding: 10px 4px; cursor: default; }
+.card.strip .w { writing-mode: vertical-rl; font-size: 0.86em; white-space: nowrap; overflow: hidden; max-height: 100%; width: calc(var(--cw) * 0.26); text-align: start; }
+.card.strip::after { display: none; }
+
+/* Filled slot: tab with the set name */
+.tab {
+  position: absolute; left: 50%; top: -15px; transform: translateX(-50%); z-index: 2;
+  max-width: 96%; background: var(--pink); color: #ffffff; border-radius: 6px 6px 0 0;
+  font-size: 12px; font-weight: 600; padding: 2px 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.slot .card { cursor: default; }
+.slot .cnt { position: absolute; right: 10px; top: 8px; font-size: 13px; font-weight: 600; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+
+/* Drag + feedback */
+.lifted { visibility: hidden; }
+.ghost { position: fixed; left: 0; top: 0; z-index: 60; pointer-events: none; will-change: transform; }
+.ghost .gc { position: absolute; left: 0; }
+.ghost .card { box-shadow: 0 14px 24px rgba(20, 36, 100, 0.35), 0 0 0 1px rgba(75, 34, 56, 0.08); }
+.ghost .card.base { box-shadow: 0 14px 24px rgba(20, 36, 100, 0.35), inset 0 0 0 4px var(--pink); }
+.ok > .well, .ok > .card, .ok .top-card { outline: 3px dashed rgba(255, 255, 255, 0.75); outline-offset: 2px; border-radius: 12px; }
+.hot > .well, .hot > .card, .hot .top-card { outline: 4px solid var(--hot); outline-offset: 2px; }
+.arrive { animation: arrive 0.24s ease-out; }
+.nudge { animation: nudge 0.32s ease; }
+.flash { animation: flash 0.45s ease; }
+@keyframes arrive { from { transform: scale(0.9); opacity: 0.4; } }
+@keyframes nudge { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+@keyframes flash { 40% { transform: scale(1.07); } }
+
+/* Undo dock */
+.dock {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; pointer-events: none;
+  display: flex; justify-content: center;
+  padding: 0 max(16px, env(safe-area-inset-right, 0px)) calc(16px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+}
+.undo {
+  pointer-events: auto; display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--f-game); font-weight: 600; font-size: 17px; color: var(--navy);
+  background: #ffffff; border: 0; border-radius: 16px; padding: 12px 18px 12px 14px; cursor: pointer;
+  box-shadow: 0 4px 0 var(--shade), 0 8px 18px rgba(20, 36, 100, 0.2);
+}
+.undo svg { width: 22px; height: 22px; }
+.undo b { font-weight: 700; font-variant-numeric: tabular-nums; }
+.undo[disabled] { opacity: 0.55; cursor: default; box-shadow: 0 4px 0 var(--shade); }
+.undo:focus-visible { outline: 3px solid var(--hot); outline-offset: 2px; }
+.coin.sm { width: 20px; height: 20px; }
+
+/* Sheets */
+.overlay {
+  position: fixed; inset: 0; z-index: 80; background: var(--scrim);
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: 16px max(16px, env(safe-area-inset-right, 0px)) calc(16px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+}
+.sheet {
+  width: 100%; max-width: 440px; background: var(--card); color: var(--ink);
+  border-radius: 22px; padding: 22px 20px 18px; box-shadow: inset 0 0 0 4px var(--pink-soft);
+  display: flex; flex-direction: column; gap: 12px; max-height: 100%; overflow-y: auto;
+  font-family: var(--f-text); -webkit-user-select: text; user-select: text;
+}
+.sheet h2 { font-family: var(--f-game); font-weight: 600; font-size: 27px; line-height: 1.1; margin: 0; text-wrap: balance; }
+.sheet p { margin: 0; color: var(--ink-soft); line-height: 1.45; font-size: 15px; }
+.sheet ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; line-height: 1.4; font-size: 15px; }
+.eyebrow { font-family: var(--f-game); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--pink-deep); font-weight: 600; }
+.reward { display: flex; align-items: center; gap: 10px; font-family: var(--f-game); font-weight: 700; font-size: 36px; }
+.btns { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.btn { font-family: var(--f-game); font-weight: 600; font-size: 17px; padding: 14px 16px; border-radius: 14px; border: 0; cursor: pointer; }
+.btn.primary { background: var(--pink); color: #ffffff; box-shadow: 0 3px 0 var(--pink-deep); }
+.btn.secondary { background: #e3ebfc; color: var(--navy); }
+.btn.danger { background: var(--low); color: #ffffff; }
+.btn.plain { background: transparent; color: var(--ink-soft); }
+.btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+.btn:focus-visible, .iconbtn:focus-visible { outline: 3px solid var(--hot); outline-offset: 2px; }
+
+.toast {
+  position: fixed; left: 50%; bottom: calc(92px + env(safe-area-inset-bottom, 0px)); z-index: 70;
+  transform: translate(-50%, 8px); opacity: 0; pointer-events: none;
+  background: var(--navy); color: #ffffff; padding: 10px 18px; border-radius: 999px;
+  font-weight: 500; font-size: 15px; max-width: calc(100% - 32px); text-align: center;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+<main class="app" id="app" lang="en">
+  <header class="top">
+    <button class="iconbtn" id="menuBtn" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <div class="coins" aria-label="Coins"><i class="coin"></i><span id="coins">100</span></div>
+    <div class="progress"><span class="lvl">Level <b id="lvl">1</b></span><div class="pips" id="pips"></div></div>
+  </header>
+
+  <section class="row2">
+    <div class="ribbon" id="ribbon"><span>Moves</span><b id="moves">0</b></div>
+    <div class="deckzone"><div class="fan" id="waste"></div><div class="stock" id="stock"></div></div>
+  </section>
+
+  <section class="grid4 slots" id="slots"></section>
+  <section class="grid4 tableau" id="tableau"></section>
+</main>
+
+<div class="dock">
+  <button class="undo" id="undoBtn" aria-label="Undo last move, costs 10 coins">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
+    <span>Undo</span><i class="coin sm"></i><b>10</b>
+  </button>
+</div>
+<div class="ghost" id="ghost" hidden></div>
+<div class="overlay" id="overlay" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function (root) {
+  // Each set: [category name, six words]. Each level picks a few sets and some of their words.
+  const BANK = [
+    ["Fruits", ["Apple", "Mango", "Cherry", "Banana", "Kiwi", "Papaya"]],
+    ["Vegetables", ["Carrot", "Spinach", "Celery", "Broccoli", "Radish", "Turnip"]],
+    ["Colors", ["Crimson", "Teal", "Violet", "Amber", "Indigo", "Magenta"]],
+    ["Planets", ["Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Neptune"]],
+    ["Dog breeds", ["Poodle", "Beagle", "Boxer", "Collie", "Husky", "Dachshund"]],
+    ["Instruments", ["Violin", "Trumpet", "Cello", "Flute", "Harp", "Drums"]],
+    ["Weather", ["Thunder", "Drizzle", "Hail", "Fog", "Blizzard", "Breeze"]],
+    ["Kitchen tools", ["Whisk", "Ladle", "Spatula", "Colander", "Grater", "Tongs"]],
+    ["Sea creatures", ["Octopus", "Dolphin", "Shark", "Jellyfish", "Seahorse", "Whale"]],
+    ["Birds", ["Robin", "Eagle", "Parrot", "Owl", "Flamingo", "Penguin"]],
+    ["Board games", ["Chess", "Checkers", "Backgammon", "Mahjong", "Dominoes", "Mancala"]],
+    ["Shapes", ["Circle", "Triangle", "Hexagon", "Oval", "Pentagon", "Rectangle"]],
+    ["Body parts", ["Elbow", "Ankle", "Shoulder", "Knee", "Wrist", "Chin"]],
+    ["Clothing", ["Jacket", "Scarf", "Sweater", "Sandals", "Hoodie", "Overalls"]],
+    ["Tools", ["Hammer", "Wrench", "Pliers", "Screwdriver", "Chisel", "Saw"]],
+    ["Dances", ["Salsa", "Tango", "Waltz", "Cumbia", "Bachata", "Flamenco"]],
+    ["Spices", ["Cumin", "Paprika", "Turmeric", "Oregano", "Cinnamon", "Nutmeg"]],
+    ["Gemstones", ["Ruby", "Emerald", "Sapphire", "Opal", "Topaz", "Diamond"]],
+    ["Trees", ["Oak", "Maple", "Willow", "Birch", "Cedar", "Redwood"]],
+    ["Flowers", ["Tulip", "Daisy", "Orchid", "Lily", "Sunflower", "Peony"]],
+    ["Sports", ["Soccer", "Tennis", "Hockey", "Golf", "Rugby", "Volleyball"]],
+    ["Desserts", ["Brownie", "Flan", "Tiramisu", "Cupcake", "Churro", "Cheesecake"]],
+    ["Breakfast", ["Pancakes", "Waffles", "Omelet", "Oatmeal", "Bagel", "Granola"]],
+    ["Coffee drinks", ["Latte", "Espresso", "Mocha", "Cappuccino", "Americano", "Cortado"]],
+    ["Cheeses", ["Brie", "Cheddar", "Gouda", "Feta", "Parmesan", "Mozzarella"]],
+    ["Pasta shapes", ["Penne", "Rigatoni", "Linguine", "Fusilli", "Ravioli", "Orzo"]],
+    ["Capital cities", ["Paris", "Tokyo", "Madrid", "Lima", "Cairo", "Ottawa"]],
+    ["Countries", ["Brazil", "Kenya", "Norway", "Vietnam", "Chile", "Portugal"]],
+    ["Insects", ["Beetle", "Ant", "Moth", "Cricket", "Wasp", "Firefly"]],
+    ["Farm animals", ["Cow", "Goat", "Pig", "Sheep", "Rooster", "Donkey"]],
+    ["Big cats", ["Lion", "Tiger", "Jaguar", "Leopard", "Cheetah", "Panther"]],
+    ["Vehicles", ["Truck", "Scooter", "Tractor", "Bus", "Motorcycle", "Van"]],
+    ["Boats", ["Canoe", "Yacht", "Kayak", "Ferry", "Sailboat", "Gondola"]],
+    ["Furniture", ["Sofa", "Dresser", "Bookshelf", "Ottoman", "Stool", "Wardrobe"]],
+    ["Office supplies", ["Stapler", "Paperclip", "Highlighter", "Envelope", "Binder", "Eraser"]],
+    ["Emotions", ["Joy", "Anger", "Fear", "Pride", "Envy", "Grief"]],
+    ["Metals", ["Copper", "Silver", "Iron", "Nickel", "Zinc", "Platinum"]],
+    ["Night sky", ["Moon", "Comet", "Constellation", "Satellite", "Meteor", "Aurora"]],
+    ["Camping gear", ["Tent", "Lantern", "Compass", "Backpack", "Sleeping bag", "Campfire"]],
+    ["At the beach", ["Sandcastle", "Seashell", "Umbrella", "Sunscreen", "Towel", "Wave"]],
+    ["Breads", ["Baguette", "Croissant", "Sourdough", "Pita", "Tortilla", "Brioche"]],
+    ["Nuts", ["Almond", "Cashew", "Pecan", "Walnut", "Pistachio", "Hazelnut"]],
+    ["Herbs", ["Basil", "Mint", "Thyme", "Rosemary", "Parsley", "Cilantro"]],
+    ["Mythical creatures", ["Dragon", "Unicorn", "Phoenix", "Griffin", "Mermaid", "Centaur"]],
+    ["Reptiles", ["Iguana", "Gecko", "Python", "Cobra", "Turtle", "Alligator"]],
+    ["Rooms", ["Kitchen", "Attic", "Basement", "Garage", "Pantry", "Bedroom"]],
+    ["Jobs", ["Nurse", "Pilot", "Chef", "Plumber", "Teacher", "Farmer"]],
+    ["Writing tools", ["Pen", "Pencil", "Crayon", "Marker", "Chalk", "Quill"]],
+    ["Math words", ["Fraction", "Decimal", "Equation", "Angle", "Ratio", "Integer"]],
+    ["Things with keys", ["Piano", "Keyboard", "Padlock", "Map", "Typewriter", "Treasure chest"]],
+    ["Cold things", ["Ice", "Glacier", "Snowman", "Igloo", "Freezer", "Popsicle"]],
+    ["Hot things", ["Lava", "Oven", "Sauna", "Desert", "Furnace", "Kettle"]],
+    ["Things with stripes", ["Zebra", "Barcode", "Candy cane", "Crosswalk", "Referee", "Barber pole"]],
+    ["Things that bounce", ["Ball", "Trampoline", "Pogo stick", "Kangaroo", "Bouncy castle", "Superball"]],
+    ["In a wallet", ["Cash", "Receipt", "License", "Photo", "Coupon", "Library card"]],
+    ["At a wedding", ["Veil", "Bouquet", "Vows", "Tuxedo", "Ring bearer", "Toast"]],
+    ["At a birthday", ["Candles", "Balloons", "Piñata", "Presents", "Confetti", "Party hat"]],
+    ["In a hospital", ["Stethoscope", "Gurney", "X-ray", "Scrubs", "Bandage", "Wheelchair"]],
+    ["Things with teeth", ["Comb", "Zipper", "Gear", "Rake", "Crocodile", "Bear trap"]],
+    ["Things that ring", ["Bell", "Telephone", "Alarm clock", "Doorbell", "Wind chime", "Church tower"]],
+    ["Sticky things", ["Honey", "Glue", "Tape", "Syrup", "Gum", "Sap"]],
+    ["Things with shells", ["Snail", "Egg", "Peanut", "Clam", "Crab", "Taco"]],
+    ["Things you fold", ["Laundry", "Napkin", "Origami", "Lawn chair", "Paper fan", "Crepe"]],
+    ["Halloween", ["Pumpkin", "Ghost", "Witch", "Cauldron", "Skeleton", "Costume"]],
+    ["Yellow things", ["Lemon", "Taxi", "Corn", "Canary", "Yolk", "Rubber duck"]],
+    ["Red things", ["Fire truck", "Stop sign", "Ladybug", "Tomato", "Strawberry", "Lipstick"]],
+    ["Green things", ["Frog", "Lime", "Shamrock", "Pickle", "Avocado", "Cactus"]],
+    ["Spanish numbers", ["Uno", "Dos", "Tres", "Cuatro", "Cinco", "Seis"]],
+    ["Playing cards", ["Ace", "King", "Queen", "Jack", "Joker", "Deuce"]],
+    ["Chess terms", ["Pawn", "Rook", "Bishop", "Knight", "Checkmate", "Castling"]],
+    ["Zodiac signs", ["Aries", "Taurus", "Gemini", "Leo", "Libra", "Scorpio"]],
+    ["Landforms", ["Canyon", "Valley", "Plateau", "Delta", "Island", "Peninsula"]],
+    ["Greek letters", ["Alpha", "Beta", "Gamma", "Sigma", "Omega", "Lambda"]],
+    ["Fabrics", ["Cotton", "Silk", "Denim", "Velvet", "Linen", "Wool"]],
+    ["Hairstyles", ["Braid", "Ponytail", "Bun", "Bob", "Mohawk", "Pixie"]],
+    ["Appliances", ["Blender", "Toaster", "Microwave", "Dishwasher", "Air fryer", "Rice cooker"]],
+    ["Tech gear", ["Mouse", "Monitor", "Webcam", "Router", "Charger", "Speaker"]],
+    ["Animal sounds", ["Moo", "Oink", "Bark", "Meow", "Quack", "Hiss"]],
+    ["Baby animals", ["Puppy", "Kitten", "Calf", "Foal", "Cub", "Duckling"]],
+    ["In a classroom", ["Whiteboard", "Desk", "Globe", "Ruler", "Textbook", "Recess"]],
+    ["Superpowers", ["Flight", "Invisibility", "Telepathy", "Super speed", "Teleporting", "Shapeshifting"]],
+    ["Fast food", ["Burger", "Fries", "Nuggets", "Hot dog", "Milkshake", "Burrito"]],
+    ["Condiments", ["Ketchup", "Mustard", "Mayo", "Relish", "Hot sauce", "Soy sauce"]],
+    ["Winter", ["Mittens", "Sled", "Snowflake", "Fireplace", "Cocoa", "Earmuffs"]],
+    ["Garden", ["Shovel", "Hose", "Wheelbarrow", "Seeds", "Trowel", "Compost"]],
+    ["Music genres", ["Jazz", "Reggae", "Blues", "Opera", "Punk", "Disco"]],
+    ["Latin American food", ["Tamales", "Arepa", "Empanada", "Pupusa", "Ceviche", "Mole"]],
+    ["Teas", ["Chamomile", "Earl Grey", "Matcha", "Chai", "Oolong", "Jasmine"]],
+    ["Units", ["Inch", "Mile", "Gallon", "Ounce", "Liter", "Meter"]],
+    ["Time", ["Second", "Minute", "Hour", "Decade", "Century", "Week"]],
+
+    // ---- Brain, body and world (medium) ----
+    ["Psychology terms", ["Schema", "Priming", "Heuristic", "Placebo", "Attachment", "Resilience"]],
+    ["Defense mechanisms", ["Denial", "Repression", "Projection", "Sublimation", "Displacement", "Regression"]],
+    ["Cognitive biases", ["Anchoring", "Hindsight", "Confirmation", "Framing", "Bandwagon", "Halo effect"]],
+    ["Types of memory", ["Episodic", "Semantic", "Procedural", "Working", "Sensory", "Long-term"]],
+    ["Brain parts", ["Cortex", "Amygdala", "Hippocampus", "Cerebellum", "Thalamus", "Brainstem"]],
+    ["Neurotransmitters", ["Dopamine", "Serotonin", "GABA", "Glutamate", "Acetylcholine", "Endorphin"]],
+    ["Hormones", ["Insulin", "Cortisol", "Estrogen", "Melatonin", "Adrenaline", "Oxytocin"]],
+    ["Cell parts", ["Nucleus", "Ribosome", "Mitochondria", "Membrane", "Cytoplasm", "Vacuole"]],
+    ["Genetics", ["Gene", "Allele", "Chromosome", "DNA", "Mutation", "Genome"]],
+    ["Immune system", ["Antibody", "T cell", "Macrophage", "Antigen", "Lymph node", "Vaccine"]],
+    ["Bones", ["Femur", "Tibia", "Sternum", "Clavicle", "Patella", "Humerus"]],
+    ["Organs", ["Liver", "Kidney", "Spleen", "Pancreas", "Lungs", "Appendix"]],
+    ["Nutrients", ["Calcium", "Magnesium", "Folate", "Vitamin D", "Potassium", "Fiber"]],
+    ["Sleep", ["REM", "Insomnia", "Circadian", "Snooze", "Nap", "Lullaby"]],
+    ["Exercises", ["Squat", "Lunge", "Plank", "Burpee", "Deadlift", "Push-up"]],
+    ["Calm habits", ["Meditation", "Journaling", "Gratitude", "Breathwork", "Stretching", "Affirmation"]],
+    ["U.S. government", ["Senate", "Congress", "Veto", "Filibuster", "Amendment", "Cabinet"]],
+    ["Elections", ["Ballot", "Primary", "Caucus", "Polling place", "Electorate", "Referendum"]],
+    ["Systems of government", ["Democracy", "Monarchy", "Republic", "Oligarchy", "Federation", "Theocracy"]],
+    ["Economics", ["Inflation", "Tariff", "Recession", "Supply", "Demand", "Interest rate"]],
+    ["Philosophers", ["Plato", "Socrates", "Kant", "Descartes", "Confucius", "Aristotle"]],
+    ["Literary devices", ["Metaphor", "Irony", "Simile", "Alliteration", "Hyperbole", "Foreshadowing"]],
+    ["Elements", ["Hydrogen", "Oxygen", "Carbon", "Helium", "Nitrogen", "Neon"]],
+    ["Statistics", ["Mean", "Median", "Mode", "Variance", "Outlier", "Sample"]],
+    ["Cybersecurity", ["Phishing", "Malware", "Firewall", "Encryption", "Ransomware", "Two-factor"]],
+    ["Spanish colors", ["Rojo", "Azul", "Verde", "Amarillo", "Negro", "Blanco"]],
+
+    // ---- Think sideways (hard) ----
+    ["Before \"ball\"", ["Foot", "Eye", "Snow", "Meat", "Basket", "Dodge"]],
+    ["Before \"fly\"", ["Butter", "Dragon", "Fire", "House", "Horse", "Fruit"]],
+    ["Before \"light\"", ["Flash", "Spot", "Head", "Candle", "Traffic", "Moon"]],
+    ["Before \"cake\"", ["Cup", "Pan", "Carrot", "Fish", "Sponge", "Pound"]],
+    ["Before \"ship\"", ["Friend", "Leader", "Hard", "Owner", "Champion", "Relation"]],
+    ["Things with bark", ["Dog", "Seal", "Oak", "Cinnamon", "Fox", "Drill sergeant"]],
+    ["Things with spines", ["Book", "Cactus", "Porcupine", "Hedgehog", "Sea urchin", "Stingray"]],
+    ["Things with rings", ["🪐|Saturn", "🧅|Onion", "Olympics", "Circus", "Tree trunk", "Boxing"]],
+    ["Things that run", ["Nose", "River", "Engine", "Mascara", "Faucet", "Program"]],
+    ["Things you can break", ["Promise", "Record", "Silence", "Habit", "Code", "Ice"]],
+    ["Things you can catch", ["Cold", "Breath", "Flight", "Bus", "Glimpse", "Feelings"]],
+    ["Things that are drawn", ["Bath", "Curtains", "Conclusion", "Sword", "Blood", "Straws"]],
+    ["Things with tongues", ["Shoe", "Flame", "Snake", "Wagon", "Language", "Gossip"]],
+    ["Hidden animals", ["Scatter", "Pigment", "Plant", "Battle", "Crowd", "Beard"]],
+    ["Silent first letter", ["Knife", "Gnome", "Honest", "Write", "Knot", "Pneumonia"]],
+    ["Palindromes", ["Racecar", "Level", "Radar", "Civic", "Noon", "Rotor"]],
+    ["Things with a face", ["Clock", "Coin", "Cliff", "Watch", "Dice", "Card"]],
+
+    // ---- Picture sets ----
+    ["Getting around", ["🚂|Train", "🚕|Taxi", "🛵|Moped", "✈️|Airplane", "🚁|Helicopter", "🚲|Bicycle"]],
+    ["Sky today", ["☀️|Sunny", "🌧️|Rain", "❄️|Snow", "🌈|Rainbow", "⚡|Lightning", "🌪️|Tornado"]],
+    ["Fruit bowl", ["🍓|Strawberry", "🍍|Pineapple", "🍉|Watermelon", "🍇|Grapes", "🍑|Peach", "🥥|Coconut"]],
+    ["Balls", ["⚽|Soccer ball", "🏀|Basketball", "🎾|Tennis ball", "🏈|Football", "⚾|Baseball", "🎱|Pool ball"]],
+    ["Faces", ["😀|Happy", "😢|Sad", "😡|Angry", "😱|Scared", "😴|Sleepy", "😍|In love"]],
+    ["Band", ["🎸|Guitar", "🎻|Fiddle", "🪗|Accordion", "🎷|Saxophone", "🪕|Banjo", "🎤|Microphone"]],
+    ["Under the sea", ["🐠|Clownfish", "🦞|Lobster", "🐡|Pufferfish", "🦑|Squid", "🦐|Shrimp", "🦦|Otter"]],
+    ["Outer space", ["🚀|Rocket", "🛸|UFO", "👽|Alien", "🔭|Telescope", "🌌|Galaxy", "🛰️|Space station"]],
+    ["Creepy crawlies", ["🐝|Bee", "🦋|Butterfly", "🐛|Caterpillar", "🕷️|Spider", "🦂|Scorpion", "🪱|Worm"]],
+    ["Bakery", ["🍩|Donut", "🥐|Pastry", "🥨|Pretzel", "🍪|Cookie", "🥧|Pie", "🧇|Waffle"]],
+    ["Pets", ["🐶|Puppy dog", "🐱|Cat", "🐹|Hamster", "🐰|Bunny", "🐟|Goldfish", "🦜|Parakeet"]],
+    ["Tool box", ["🔨|Mallet", "🪛|Driver", "🔧|Spanner", "🪚|Handsaw", "📏|Tape", "🪜|Ladder"]]
+  ];
+
+
+  // Difficulty: 1 everyday, 2 knowledge and "things that" sets, 3 think-sideways sets.
+  const MEDIUM = ["Things with teeth", "Things that ring", "Sticky things", "Things with shells", "Things you fold",
+    "Things with keys", "Things with stripes", "Things that bounce", "Greek letters", "Chess terms", "Landforms",
+    "Math words", "Zodiac signs", "Gemstones", "Metals", "Philosophers", "Fabrics"];
+  const HARD_START = "Before \"ball\"", MED_START = "Psychology terms", PIC_START = "Getting around";
+  const TIER = {};
+  const PICS = new Set();
+  let band = 1;
+  BANK.forEach(([name]) => {
+    if (name === MED_START) band = 2;
+    if (name === HARD_START) band = 3;
+    if (name === PIC_START) band = "pic";
+    if (band === "pic") { PICS.add(name); TIER[name] = 1; }
+    else TIER[name] = band;
+  });
+  MEDIUM.forEach(n => { TIER[n] = 2; });
+
+  // Sets that never share a level, so no word could fairly belong to two open sets.
+  const CLASH = [
+    ["Things with shells", "Sea creatures", "Nuts", "Breakfast", "Fast food"],
+    ["Red things", "Insects", "Vegetables", "Fruits", "Colors", "Vehicles", "Gemstones"],
+    ["Yellow things", "Fruits", "Vegetables", "Birds", "Vehicles", "Colors"],
+    ["Green things", "Fruits", "Vegetables", "Herbs", "Colors"],
+    ["Things with teeth", "Reptiles", "Tools", "Sea creatures", "Garden"],
+    ["Things with stripes", "Big cats", "Sports", "Jobs"],
+    ["Things that bounce", "Sports"],
+    ["Night sky", "Planets", "Zodiac signs"],
+    ["Cold things", "Winter", "Weather", "Appliances"],
+    ["Hot things", "Appliances", "Landforms", "Kitchen tools"],
+    ["Winter", "Weather", "Clothing"],
+    ["Things with keys", "Instruments", "Tech gear", "Office supplies"],
+    ["Things that ring", "Instruments", "In a classroom"],
+    ["Sticky things", "Breakfast", "Office supplies", "Trees"],
+    ["Things you fold", "Desserts", "Breakfast", "Furniture"],
+    ["At the beach", "Weather"],
+    ["At a wedding", "Clothing", "Breads"],
+    ["At a birthday", "Desserts"],
+    ["In a hospital", "Jobs", "Clothing"],
+    ["Halloween", "Mythical creatures", "Vegetables"],
+    ["Playing cards", "Chess terms", "Board games"],
+    ["Chess terms", "Board games"],
+    ["Animal sounds", "Farm animals"],
+    ["Baby animals", "Farm animals", "Big cats"],
+    ["Kitchen tools", "Appliances"],
+    ["Coffee drinks", "Teas", "Desserts"],
+    ["Landforms", "Countries", "Capital cities"],
+    ["Gemstones", "Colors", "Metals"],
+    ["Flowers", "Teas", "Herbs"],
+    ["Spices", "Herbs", "Teas"],
+    ["Units", "Time", "Math words"],
+    ["Music genres", "Dances"],
+    ["Latin American food", "Fast food", "Desserts", "Breads"],
+    ["Breads", "Breakfast", "Hairstyles"],
+    ["Boats", "Vehicles"],
+    ["Shapes", "Math words"],
+    ["Fabrics", "Clothing"],
+    ["Rooms", "Furniture"],
+    ["In a classroom", "Office supplies", "Writing tools"],
+    ["Writing tools", "Office supplies"],
+    ["Tech gear", "Office supplies"],
+    ["Countries", "Capital cities"],
+    ["Garden", "Tools"],
+    ["Psychology terms", "Defense mechanisms", "Cognitive biases", "Types of memory", "Brain parts", "Neurotransmitters", "Sleep"],
+    ["Defense mechanisms", "Cognitive biases", "Types of memory", "Emotions"],
+    ["Cognitive biases", "Types of memory", "Statistics"],
+    ["Brain parts", "Neurotransmitters", "Organs", "Body parts", "Bones"],
+    ["Neurotransmitters", "Hormones", "Nutrients", "Sleep"],
+    ["Hormones", "Sleep", "Nutrients", "Organs"],
+    ["Cell parts", "Genetics", "Immune system", "Organs"],
+    ["Genetics", "Immune system"],
+    ["Immune system", "In a hospital", "Organs"],
+    ["Bones", "Organs", "Body parts", "In a hospital"],
+    ["Organs", "Body parts", "In a hospital"],
+    ["Nutrients", "Metals", "Elements", "Breakfast", "Calm habits"],
+    ["Sleep", "Calm habits", "Night sky", "Faces"],
+    ["Exercises", "Calm habits", "Sports", "Dances"],
+    ["U.S. government", "Elections", "Systems of government", "Economics"],
+    ["Elections", "Systems of government"],
+    ["Economics", "Statistics", "Math words"],
+    ["Philosophers", "Literary devices"],
+    ["Literary devices", "Psychology terms"],
+    ["Elements", "Metals", "Night sky"],
+    ["Statistics", "Math words", "Units"],
+    ["Cybersecurity", "Tech gear", "Office supplies"],
+    ["Spanish colors", "Colors", "Spanish numbers", "Red things", "Green things", "Yellow things"],
+    ["Before \"ball\"", "Body parts", "Sports", "Balls", "Things that bounce", "Winter", "Before \"fly\"", "Before \"light\"", "Before \"cake\"", "Before \"ship\""],
+    ["Before \"fly\"", "Mythical creatures", "Fruits", "Insects", "Creepy crawlies", "Breakfast", "Rooms", "Hot things", "Before \"light\"", "Before \"cake\"", "Before \"ship\""],
+    ["Before \"light\"", "Night sky", "Body parts", "At a birthday", "Vehicles", "Before \"cake\"", "Before \"ship\""],
+    ["Before \"cake\"", "Desserts", "Vegetables", "Sea creatures", "Kitchen tools", "Bakery", "Before \"ship\""],
+    ["Before \"ship\"", "Jobs", "Boats"],
+    ["Things with bark", "Trees", "Spices", "Dog breeds", "Sea creatures", "Pets", "Jobs", "Under the sea"],
+    ["Things with spines", "Green things", "Sea creatures", "Under the sea", "Bones", "In a classroom", "Things with stripes", "Things with teeth"],
+    ["Things with rings", "Planets", "Night sky", "Vegetables", "Trees", "Sports", "Things that ring", "Things with stripes", "Outer space"],
+    ["Things that run", "Body parts", "Vehicles", "Tech gear", "Landforms", "Garden", "Things you can catch"],
+    ["Things you can break", "Cold things", "Music genres", "Tech gear", "Things you can catch", "Things that are drawn"],
+    ["Things you can catch", "Weather", "Vehicles", "Getting around", "Emotions", "Sky today", "Things that are drawn", "Winter"],
+    ["Things that are drawn", "Furniture", "Rooms", "In a hospital", "Writing tools", "Fast food"],
+    ["Things with tongues", "Clothing", "Reptiles", "Hot things", "Things that ring", "Vehicles", "Halloween"],
+    ["Hidden animals", "Garden", "Farm animals", "Big cats", "Flowers"],
+    ["Silent first letter", "Kitchen tools", "Tools", "Writing tools", "In a hospital", "Halloween", "Body parts"],
+    ["Palindromes", "Boats", "Time", "Vehicles"],
+    ["Things with a face", "Board games", "Playing cards", "Time", "Landforms", "Things with keys", "In a wallet"],
+    ["Getting around", "Vehicles", "Boats", "Outer space", "Things you can catch"],
+    ["Sky today", "Weather", "Winter", "Night sky", "Things you can catch", "Cold things", "Hot things"],
+    ["Fruit bowl", "Fruits", "Red things", "Green things", "Yellow things", "Desserts"],
+    ["Balls", "Sports", "Things that bounce", "Board games"],
+    ["Faces", "Emotions", "Halloween"],
+    ["Band", "Instruments", "Music genres", "Things that ring", "Things with keys"],
+    ["Under the sea", "Sea creatures", "Things with shells", "At the beach", "Pets"],
+    ["Outer space", "Night sky", "Planets", "Mythical creatures", "Halloween"],
+    ["Creepy crawlies", "Insects", "Zodiac signs", "Halloween", "Garden"],
+    ["Bakery", "Desserts", "Breads", "Breakfast", "Fast food"],
+    ["Pets", "Dog breeds", "Farm animals", "Baby animals", "Birds", "Big cats", "Animal sounds"],
+    ["Tool box", "Tools", "Garden", "Units", "Office supplies"],
+    ["Things with keys", "Things with a face"],
+    ["Hot things", "Before \"fly\""],
+    ["Things you can catch", "Cold things"],
+    ["Silent first letter", "Mythical creatures", "Organs"],
+    ["Hidden animals", "Colors", "Things with bark"],
+    ["Things that are drawn", "Immune system", "Organs", "Things with spines"],
+    ["Things with tongues", "Literary devices", "Things that run"]
+  ];
+  const clash = new Set();
+  CLASH.forEach(([a, ...bs]) => bs.forEach(b => { clash.add(a + "|" + b); clash.add(b + "|" + a); }));
+
+  function rng(seed) {
+    let a = seed >>> 0;
+    return function () {
+      a = (a + 0x6d2b79f5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function shuffle(arr, r) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(r() * (i + 1));
+      const tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr;
+  }
+
+  function params(level) {
+    const cats = Math.min(3 + Math.floor((level - 1) / 2), 8);
+    const hard = level < 7 ? 0 : level < 13 ? 1 : 2;
+    const med = level < 3 ? 0 : level < 7 ? 1 : level < 13 ? (cats >= 7 ? 2 : 1) : 3;
+    return {
+      cats, hard, med,
+      pic: level === 1 || level % 3 !== 0,
+      k: level < 5 ? 4 : level < 10 ? 5 : 6,
+      slots: level < 4 ? 2 : level < 16 ? 3 : 4,
+      cols: 4,
+      stockP: level < 3 ? 0.25 : 0.35
+    };
+  }
+
+  function tryGen(level, p, r) {
+    const pools = { 3: [], 2: [], pic: [], 1: [] };
+    shuffle(BANK.map((_, i) => i), r).forEach(bi => {
+      const name = BANK[bi][0];
+      const t = TIER[name] || 1;
+      if (t === 1 && PICS.has(name)) pools.pic.push(bi); else pools[t].push(bi);
+    });
+    const chosen = [];
+    const used = new Set();
+    const key = w => w.split("|").pop().toLowerCase();
+    function take(pool, n) {
+      let got = 0;
+      while (got < n && pool.length && chosen.length < p.cats) {
+        const bi = pool.shift();
+        const name = BANK[bi][0], words = BANK[bi][1];
+        if (chosen.some(c => clash.has(c.name + "|" + name))) continue;
+        const keys = [name].concat(words).map(key);
+        if (keys.some(w => used.has(w))) continue;
+        keys.forEach(w => used.add(w));
+        chosen.push({ name, words: shuffle(words.slice(), r).slice(0, p.k) });
+        got++;
+      }
+    }
+    take(pools[3], p.hard);
+    take(pools[2], p.med);
+    if (p.pic) take(pools.pic, 1);
+    take(pools[1], p.cats);
+    take(pools.pic, p.cats);
+    take(pools[2], p.cats);
+    shuffle(chosen, r);
+    if (chosen.length < p.cats) return null;
+
+    const cards = [];
+    chosen.forEach((c, ci) => {
+      cards.push({ id: cards.length, cat: ci, kind: "cat", text: c.name });
+      c.words.forEach(w => {
+        const parts = w.split("|");
+        const card = { id: cards.length, cat: ci, kind: "word", text: parts.pop() };
+        if (parts.length) card.pic = parts[0];
+        cards.push(card);
+      });
+    });
+
+    // Build one perfect solution: every move sends a card straight to a slot.
+    const sol = [];
+    const waiting = shuffle(chosen.map((_, i) => i), r);
+    const queues = chosen.map((_, ci) => shuffle(cards.filter(x => x.cat === ci && x.kind === "word").map(x => x.id), r));
+    let active = [];
+    while (sol.length < cards.length) {
+      const opts = [];
+      if (active.length < p.slots && waiting.length) opts.push(-1);
+      active.forEach(ci => opts.push(ci));
+      const pick = opts[Math.floor(r() * opts.length)];
+      if (pick === -1) {
+        const ci = waiting.pop();
+        active.push(ci);
+        sol.push(cards.find(x => x.cat === ci && x.kind === "cat").id);
+      } else {
+        sol.push(queues[pick].pop());
+        if (!queues[pick].length) active = active.filter(a => a !== pick);
+      }
+    }
+
+    // Deal the solution out: earlier cards sit higher in each column and nearer the top of the deck.
+    const cols = Array.from({ length: p.cols }, () => []);
+    const stock = [];
+    sol.forEach(id => {
+      if (r() < p.stockP) stock.push(id);
+      else cols[Math.floor(r() * p.cols)].push(id);
+    });
+    if (cols.some(c => c.length === 0)) return null;
+    const colState = cols.map(c => c.slice().reverse().map((id, i, a) => (cards[id].kind === "cat" ? { id, up: i === a.length - 1, held: [] } : { id, up: i === a.length - 1 })));
+    const total = cards.length + stock.length;
+
+    return {
+      v: 3, level,
+      cats: chosen.map(c => ({ name: c.name, k: c.words.length })),
+      cards, cols: colState,
+      stock: stock.slice().reverse(), // last item = next card drawn
+      waste: [],
+      slots: new Array(p.slots).fill(null),
+      done: [],
+      moves: total, start: total, bought: 0,
+      won: false,
+      sol
+    };
+  }
+
+  function makeLevel(level) {
+    const p = params(level);
+    for (let t = 0; t < 400; t++) {
+      const g = tryGen(level, p, rng(level * 7919 + 1013 + t * 104729));
+      if (g) return g;
+    }
+    throw new Error("Could not build level " + level);
+  }
+
+  // ---- play rules ----
+  // Column items run bottom -> top: { id, up, held? }. A set card in a column carries `held`:
+  // the words it has collected there. A movable group is a run of face-up same-set words,
+  // or a set card with everything it holds.
+  const isCat = (g, id) => g.cards[id].kind === "cat";
+
+  function group(g, src) {
+    if (src.t === "waste") {
+      if (!g.waste.length) return null;
+      const id = g.waste[g.waste.length - 1];
+      return { src, ids: [id], base: isCat(g, id), cat: g.cards[id].cat, held: [] };
+    }
+    const col = g.cols[src.i];
+    const item = col && col[src.j];
+    if (!item || !item.up) return null;
+    const c = g.cards[item.id];
+    if (c.kind === "cat") {
+      if (src.j !== col.length - 1) return null;
+      return { src, ids: [item.id], base: true, cat: c.cat, held: item.held || [] };
+    }
+    // Grabbing any card in a same-set stack picks up the whole stack, from its lowest card.
+    let j0 = src.j;
+    while (j0 > 0) {
+      const x = col[j0 - 1], xc = g.cards[x.id];
+      if (!x.up || xc.kind !== "word" || xc.cat !== c.cat) break;
+      j0--;
+    }
+    const ids = [];
+    for (let k = j0; k < col.length; k++) {
+      const x = col[k], xc = g.cards[x.id];
+      if (!x.up || xc.kind !== "word" || xc.cat !== c.cat) return null;
+      ids.push(x.id);
+    }
+    return { src: { t: "col", i: src.i, j: j0 }, ids, base: false, cat: c.cat, held: [] };
+  }
+  function topGroup(g, ci) {
+    const col = g.cols[ci];
+    if (!col.length) return null;
+    const top = col[col.length - 1];
+    if (isCat(g, top.id)) return group(g, { t: "col", i: ci, j: col.length - 1 });
+    let j = col.length - 1;
+    while (j > 0) {
+      const x = col[j - 1];
+      if (!x.up || isCat(g, x.id) || g.cards[x.id].cat !== g.cards[top.id].cat) break;
+      j--;
+    }
+    return group(g, { t: "col", i: ci, j });
+  }
+  function groups(g) {
+    const out = [];
+    g.cols.forEach((col, i) => {
+      for (let j = 0; j < col.length; j++) { const gr = group(g, { t: "col", i, j }); if (gr) out.push(gr); }
+    });
+    const w = group(g, { t: "waste" });
+    if (w) out.push(w);
+    return out;
+  }
+  function size(gr) { return gr.ids.length + gr.held.length; }
+
+  function canSlot(g, gr, si) {
+    const s = g.slots[si];
+    if (si < 0 || si >= g.slots.length) return false;
+    if (gr.base) return s === null && g.done.indexOf(gr.cat) < 0 && !g.slots.some(x => x && x.cat === gr.cat);
+    return !!s && s.cat === gr.cat;
+  }
+  function slotFor(g, gr) {
+    for (let i = 0; i < g.slots.length; i++) if (canSlot(g, gr, i)) return i;
+    return -1;
+  }
+  function canCol(g, gr, ci) {
+    if (gr.src.t === "col" && gr.src.i === ci) return false;
+    const col = g.cols[ci];
+    if (!col) return false;
+    if (!col.length) return true;
+    const top = g.cards[col[col.length - 1].id];
+    if (top.cat !== gr.cat) return false;
+    // Classic rule: set cards only go to a slot or an empty column. Relaxed mode allows building sets on the board.
+    // A set card can always cap its own stack. Classic: once a set card holds cards, it's closed.
+    if (top.kind === "cat") {
+      if (gr.base) return false;
+      const held = col[col.length - 1].held || [];
+      return relaxed || held.length === 0;
+    }
+    return true;
+  }
+  let relaxed = false;
+  function setRelaxed(v) { relaxed = !!v; }
+  function colForTap(g, gr) {
+    for (let i = 0; i < g.cols.length; i++) if (g.cols[i].length && canCol(g, gr, i)) return i;
+    return -1;
+  }
+  function removeGroup(g, src) {
+    if (src.t === "waste") {
+      const id = g.waste.pop();
+      return [isCat(g, id) ? { id, up: true, held: [] } : { id, up: true }];
+    }
+    const col = g.cols[src.i];
+    const items = col.splice(src.j);
+    if (col.length) col[col.length - 1].up = true;
+    return items;
+  }
+  function playable(g) { return !g.won && g.moves > 0; }
+  function finish(g) { g.won = g.done.length === g.cats.length; }
+  function fill(g, si, cat, ids) {
+    const s = g.slots[si];
+    s.n += ids.length;
+    if (ids.length) s.last = g.cards[ids[ids.length - 1]].text;
+    if (s.n >= g.cats[cat].k) { g.done.push(cat); g.slots[si] = null; return cat; }
+    return null;
+  }
+
+  // Costs: each card that lands in a slot is 1 move, each deck flip is 1 move, board moves are free.
+  function cardsLeft(g) {
+    let n = g.cards.length;
+    g.done.forEach(ci => { n -= 1 + g.cats[ci].k; });
+    g.slots.forEach(s => { if (s) n -= 1 + s.n; });
+    return n;
+  }
+  function need(g) { return cardsLeft(g) + g.stock.length; }
+  function toSlot(g, gr, si) {
+    if (g.won || !canSlot(g, gr, si)) return null;
+    if (g.moves < size(gr)) return { short: size(gr) };
+    const items = removeGroup(g, gr.src);
+    let completed = null;
+    if (gr.base) {
+      g.slots[si] = { cat: gr.cat, n: 0, last: null };
+      completed = fill(g, si, gr.cat, items[0].held || []);
+    } else completed = fill(g, si, gr.cat, items.map(x => x.id));
+    g.moves -= size(gr); finish(g);
+    return { slot: si, completed, count: size(gr) };
+  }
+  function toCol(g, gr, ci) {
+    if (g.won || !canCol(g, gr, ci)) return null;
+    const items = removeGroup(g, gr.src);
+    const col = g.cols[ci];
+    const top = col[col.length - 1];
+    let absorbed = 0;
+    if (top && isCat(g, top.id)) {
+      top.held = (top.held || []).concat(items.map(x => x.id));
+      absorbed = items.length;
+    } else if (gr.base && top) {
+      const base = items[0];
+      const got = [];
+      while (col.length) {
+        const x = col[col.length - 1];
+        if (!x.up || isCat(g, x.id) || g.cards[x.id].cat !== gr.cat) break;
+        got.unshift(col.pop().id);
+      }
+      base.held = got.concat(base.held || []);
+      absorbed = got.length;
+      col.push(base);
+    } else col.push(...items);
+    finish(g);
+    return { col: ci, absorbed };
+  }
+  function draw(g) {
+    if (!playable(g)) return null;
+    let recycled = false;
+    if (g.stock.length) g.waste.push(g.stock.pop());
+    else if (g.waste.length) { g.stock = g.waste.reverse(); g.waste = []; recycled = true; }
+    else return null;
+    g.moves--; finish(g);
+    return { recycled };
+  }
+  function anyMove(g) {
+    if (g.stock.length || g.waste.length) return true;
+    return groups(g).some(gr => slotFor(g, gr) >= 0 || g.cols.some((_, i) => canCol(g, gr, i)));
+  }
+  function buy(g, n) { g.moves += n; g.bought += n; }
+
+  const api = { setRelaxed, BANK, TIER, PICS, cardsLeft, need, params, makeLevel, group, topGroup, groups, size, canSlot, slotFor, canCol, colForTap, toSlot, toCol, draw, anyMove, buy };
+  if (typeof module !== "undefined" && module.exports) module.exports = api;
+  else root.Core = api;
+})(this);
+</script>
+<script>
+(function () {
+  const KEY = "kindred-cards-v1";
+  const START_COINS = 100, WIN_COINS = 100, BUY_COST = 50, BUY_MOVES = 5, UNDO_COST = 10;
+
+  const $ = s => document.querySelector(s);
+  const esc0 = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  // Long single words get one soft hyphen near the middle so a forced break reads "Philoso-phers".
+  function shy(w) {
+    if (w.length < 11) return esc0(w);
+    const v = /[aeiouy]/i, mid = w.length / 2;
+    let best = -1;
+    for (let i = 4; i <= w.length - 4; i++) {
+      if (v.test(w[i - 1]) && !v.test(w[i]) && (best < 0 || Math.abs(i - mid) < Math.abs(best - mid))) best = i;
+    }
+    if (best < 0) best = Math.round(mid);
+    return esc0(w.slice(0, best)) + "&shy;" + esc0(w.slice(best));
+  }
+  const esc = s => String(s).split(" ").map(shy).join(" ");
+  const TIARA = `<svg class="tiara" viewBox="0 0 26 18" aria-hidden="true"><path fill="currentColor" d="M2.5 14.2 4.6 5.6l4.2 5.1L13 2.4l4.2 8.3 4.2-5.1 2.1 8.6c-3.4-1.5-6.9-2.2-10.5-2.2s-7.1.7-10.5 2.2Z"/><path fill="currentColor" d="M2.6 15.6c3.3-1.4 6.8-2.1 10.4-2.1s7.1.7 10.4 2.1l-.5 1.9c-3.2-1.2-6.5-1.8-9.9-1.8s-6.7.6-9.9 1.8Z"/><circle fill="currentColor" cx="4.6" cy="4.2" r="1.5"/><circle fill="currentColor" cx="13" cy="1.6" r="1.6"/><circle fill="currentColor" cx="21.4" cy="4.2" r="1.5"/><path fill="#f7c544" d="m13 7.4 1.7 2.3-1.7 2.3-1.7-2.3Z"/></svg>`;
+  const TIARA_OUTLINE = `<svg viewBox="0 0 26 18" aria-hidden="true"><path fill="currentColor" d="M2.5 14.2 4.6 5.6l4.2 5.1L13 2.4l4.2 8.3 4.2-5.1 2.1 8.6c-3.4-1.5-6.9-2.2-10.5-2.2s-7.1.7-10.5 2.2Z"/><path fill="currentColor" d="M2.6 15.6c3.3-1.4 6.8-2.1 10.4-2.1s7.1.7 10.4 2.1l-.5 1.9c-3.2-1.2-6.5-1.8-9.9-1.8s-6.7.6-9.9 1.8Z"/></svg>`;
+  const CHECK = `<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.3 4.8 9 10 3" fill="none" stroke="#3f6ee0" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const RECYCLE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v5h-5"/></svg>`;
+
+  function load() {
+    try {
+      const s = JSON.parse(localStorage.getItem(KEY));
+      if (s && s.level >= 1 && typeof s.coins === "number") return s;
+    } catch (e) {}
+    return { level: 1, coins: START_COINS, game: null, seenHelp: false };
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} }
+
+  let store = load();
+  let G = (store.game && store.game.v === 3 && store.game.level === store.level && !store.game.won) ? store.game : Core.makeLevel(store.level);
+  store.game = G;
+  save();
+
+  Core.setRelaxed(store.relaxed);
+  let history = [];
+  let moved = new Set(), flashSlot = null, between = false;
+  let dims = { cw: 82, ch: 113, offD: 15, offU: 31 };
+
+  /* ---------- drawing ---------- */
+  function measure() {
+    const w = $("#tableau").clientWidth || 358;
+    const cw = Math.floor((w - 30) / 4);
+    const ch = Math.round(cw * 1.38);
+    const r = document.documentElement.style;
+    r.setProperty("--cw", cw + "px");
+    r.setProperty("--ch", ch + "px");
+    dims = { cw, ch, offD: Math.round(ch * 0.13), offU: Math.round(ch * 0.27) };
+  }
+  function a(id) { return moved.has(id) ? " arrive" : ""; }
+  function sizeCls() { return ""; }
+  function fit(t) {
+    const longest = Math.max(...String(t).split(/[\s-]+/).map(w => w.length));
+    const base = Math.max(13, Math.min(18, dims.cw * 0.18));
+    const px = Math.max(10.5, Math.min(base, (dims.cw - 18) / (longest * 0.58)));
+    return ` style="font-size:${px.toFixed(1)}px"`;
+  }
+  function wordCard(id, attrs, cls) {
+    const c = G.cards[id];
+    if (c.pic) {
+      return `<div class="card word pic${cls}${a(id)}" data-id="${id}" ${attrs}><span class="em">${c.pic}</span><span class="w cap">${esc(c.text)}</span></div>`;
+    }
+    return `<div class="card word${cls}${a(id)}" data-id="${id}" ${attrs}${fit(c.text)}><span class="w">${esc(c.text)}</span></div>`;
+  }
+  function stripCard(id, attrs) {
+    return `<div class="card word under${a(id)}" data-id="${id}" ${attrs}><span class="w">${label(id)}</span></div>`;
+  }
+  function label(id) { const c = G.cards[id]; return (c.pic ? c.pic + " " : "") + esc(c.text); }
+  function baseCard(id, n, attrs, cls) {
+    const c = G.cards[id], k = G.cats[c.cat].k;
+    return `<div class="card base${n >= k ? " full" : ""}${cls}${a(id)}" data-id="${id}" ${attrs}${fit(c.text)}>${TIARA}<span class="cnt">${n}/${k}</span><span class="w">${esc(c.text)}</span></div>`;
+  }
+
+  function render() {
+    measure();
+    $("#lvl").textContent = G.level;
+    $("#moves").textContent = Math.max(0, G.moves);
+    $("#ribbon").classList.toggle("low", G.moves <= 5 && !G.won);
+    $("#coins").textContent = store.coins;
+    $("#undoBtn").disabled = !history.length || between;
+    $("#pips").innerHTML = G.cats.map((_, i) => G.done.indexOf(i) >= 0 ? `<i class="pip on">${CHECK}</i>` : `<i class="pip"></i>`).join("");
+
+    $("#stock").innerHTML = G.stock.length
+      ? `<div class="card down" aria-label="Draw a card"></div><span class="badge">${G.stock.length}</span>`
+      : G.waste.length
+        ? `<div class="well recycle" aria-label="Flip the pile back">${RECYCLE}</div>`
+        : `<div class="well"></div>`;
+
+    const show = G.waste.slice(-3);
+    const strip = Math.round(dims.cw * 0.28);
+    $("#waste").innerHTML = show.map((id, idx) => {
+      const fromTop = show.length - 1 - idx;
+      const left = fromTop * strip;
+      const z = 10 - fromTop;
+      if (fromTop === 0) {
+        const c = G.cards[id];
+        const attrs = `data-src="waste"`;
+        const html = c.kind === "cat" ? baseCard(id, 0, attrs, " top-card") : wordCard(id, attrs, " top-card");
+        return `<div class="fc" style="left:0;z-index:${z}">${html}</div>`;
+      }
+      return `<div class="fc" style="left:${left}px;z-index:${z}"><div class="card strip"><span class="w">${label(id)}</span></div></div>`;
+    }).join("");
+
+    $("#slots").innerHTML = [0, 1, 2, 3].map(i => {
+      if (i >= G.slots.length) return `<div></div>`;
+      const s = G.slots[i];
+      const fl = flashSlot === i ? " flash" : "";
+      if (!s) return `<div class="cell slot${fl}" data-slot="${i}"><div class="well">${TIARA_OUTLINE}</div></div>`;
+      const cat = G.cats[s.cat];
+      const baseId = G.cards.find(c => c.kind === "cat" && c.cat === s.cat).id;
+      if (s.n === 0) return `<div class="cell slot${fl}" data-slot="${i}">${baseCard(baseId, 0, "", "")}</div>`;
+      const lastCard = G.cards.find(c => c.kind === "word" && c.cat === s.cat && c.text === s.last);
+      const face = lastCard && lastCard.pic
+        ? `<span class="em">${lastCard.pic}</span><span class="w cap">${esc(s.last)}</span>`
+        : `<span class="w">${esc(s.last)}</span>`;
+      return `<div class="cell slot${fl}" data-slot="${i}"><span class="tab">${esc(cat.name)}</span>` +
+        `<div class="card${lastCard && lastCard.pic ? " pic" : ""}"${lastCard && lastCard.pic ? "" : fit(s.last)}><span class="cnt">${s.n}/${cat.k}</span>${face}</div></div>`;
+    }).join("");
+
+    $("#tableau").innerHTML = G.cols.map((col, ci) => {
+      if (!col.length) return `<div class="col" data-col="${ci}"><div class="well top-card"></div></div>`;
+      let top = 0;
+      const parts = [];
+      col.forEach((x, j) => {
+        const isTop = j === col.length - 1;
+        const attrs = `data-src="col:${ci}:${j}" data-ci="${ci}" data-j="${j}"`;
+        if (!x.up) {
+          parts.push(`<div class="pos" style="top:${top}px"><div class="card down" data-ci="${ci}" data-j="${j}"></div></div>`);
+          top += dims.offD;
+          return;
+        }
+        const c = G.cards[x.id];
+        if (c.kind === "cat") {
+          (x.held || []).forEach(h => {
+            parts.push(`<div class="pos" style="top:${top}px">${stripCard(h, attrs)}</div>`);
+            top += dims.offU;
+          });
+          parts.push(`<div class="pos" style="top:${top}px">${baseCard(x.id, (x.held || []).length, attrs, isTop ? " top-card" : " under")}</div>`);
+        } else {
+          parts.push(`<div class="pos" style="top:${top}px">${isTop ? wordCard(x.id, attrs, " top-card") : stripCard(x.id, attrs)}</div>`);
+        }
+        if (!isTop) top += dims.offU;
+      });
+      return `<div class="col" data-col="${ci}" style="height:${top + dims.ch}px">${parts.join("")}</div>`;
+    }).join("");
+
+    moved = new Set();
+    flashSlot = null;
+  }
+
+  /* ---------- feedback ---------- */
+  let toastTimer = null;
+  function toast(msg) {
+    const t = $("#toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove("show"), 1900);
+  }
+  function nudge(src) {
+    const sel = src.t === "waste" ? `#waste [data-src="waste"]` : `#tableau [data-ci="${src.i}"]`;
+    document.querySelectorAll(sel).forEach(el => {
+      if (src.t === "col" && +el.dataset.j < src.j) return;
+      el.classList.remove("nudge"); void el.offsetWidth; el.classList.add("nudge");
+    });
+  }
+
+  /* ---------- sheets ---------- */
+  let sheetButtons = [];
+  function openSheet(html, buttons) {
+    sheetButtons = buttons;
+    $("#sheet").innerHTML = html + `<div class="btns">` + buttons.map((b, i) =>
+      `<button class="btn ${b.kind || "secondary"}" data-b="${i}"${b.disabled ? " disabled" : ""}>${b.label}</button>`).join("") + `</div>`;
+    $("#overlay").hidden = false;
+  }
+  function closeSheet() { $("#overlay").hidden = true; sheetButtons = []; }
+  $("#overlay").addEventListener("click", e => {
+    const b = e.target.closest("[data-b]");
+    if (!b || b.disabled) return;
+    const fn = sheetButtons[+b.dataset.b].onClick;
+    fn && fn();
+  });
+
+  function showHelp() {
+    openSheet(`<h2>How to play</h2>
+      <ol>
+        <li>Each level hides a few sets of related words and pictures. Every set has one <b>set card</b>, the one with the pink frame and tiara.</li>
+        <li>Drag a set card into an empty slot at the top, then drag its cards onto it. A set clears when all its cards are in.</li>
+        <li>Stack cards from the same set on each other and move stacks between columns. <b>Board moves are free.</b> Drag a set card onto its stack to cap it, then drag the whole bundle into an empty slot. Once a set card caps a stack, nothing else goes on top. Want it gentler? <b>Relaxed mode</b> in the menu lets you keep adding to it.</li>
+        <li>Moves are spent two ways: <b>1 per deck flip</b> and <b>1 per card</b> that lands in a top slot.</li>
+        <li>The limit is exactly what the best game needs, so flipping the deck back around is the move you can't afford.</li>
+        <li>Some sets are easy, some test what you know, and some ask you to think sideways, like "things with bark".</li>
+        <li>Made a mistake? <b>Undo</b> costs ${UNDO_COST} coins and gives back any moves it spent.</li>
+        <li>A win pays <b>${WIN_COINS} coins</b>. Short on moves? <b>${BUY_COST} coins</b> buys ${BUY_MOVES} more.</li>
+      </ol>`, [{ label: "Play", kind: "primary", onClick: closeSheet }]);
+  }
+  function buyButtons(extraLabel) {
+    const can = store.coins >= BUY_COST;
+    return [
+      { label: can ? `Get ${BUY_MOVES} moves · ${BUY_COST} coins` : `You need ${BUY_COST} coins`, kind: "primary", disabled: !can, onClick: buyMoves },
+      { label: "Restart level", kind: "secondary", onClick: () => { closeSheet(); restart(); } },
+      { label: extraLabel || "Look at the board", kind: "plain", onClick: closeSheet }
+    ];
+  }
+  function showLost() {
+    if (G.won) return;
+    const needN = Core.need(G);
+    if (needN <= G.moves) return;
+    openSheet(`<h2>Out of moves</h2>
+      <p>Finishing needs ${needN} more moves and you have ${G.moves}. ${G.done.length} of ${G.cats.length} sets cleared. You have ${store.coins} coins.</p>`, buyButtons());
+  }
+  function showShort(cost) {
+    openSheet(`<h2>Not enough moves</h2>
+      <p>Those ${cost} cards cost ${cost} moves to put up and you have ${G.moves}. You have ${store.coins} coins.</p>`, buyButtons("Keep playing"));
+  }
+  function showRecycle(cost) {
+    openSheet(`<h2>Flip the deck back?</h2>
+      <p>Going through the deck again would take ${cost} moves and you have ${G.moves}. Every card still needs its own move to reach a slot. You have ${store.coins} coins.</p>`, buyButtons("Keep playing"));
+  }
+  function buyMoves() {
+    if (store.coins < BUY_COST) return;
+    store.coins -= BUY_COST;
+    Core.buy(G, BUY_MOVES);
+    save(); closeSheet(); render();
+    toast(`+${BUY_MOVES} moves`);
+    if (Core.need(G) > G.moves) setTimeout(showLost, 500);
+  }
+  function showStuck() {
+    openSheet(`<h2>No moves left on the board</h2><p>Nothing can move from here. Start the level over to try another route.</p>`,
+      [{ label: "Restart level", kind: "primary", onClick: () => { closeSheet(); restart(); } }]);
+  }
+  function onWin() {
+    const finished = G;
+    store.coins += WIN_COINS;
+    store.level = finished.level + 1;
+    store.game = null;
+    between = true;
+    save();
+    render();
+    const note = finished.bought ? `You bought ${finished.bought} extra moves.` : `Perfect run, no extra moves.`;
+    setTimeout(() => openSheet(`<span class="eyebrow">Level ${finished.level} cleared</span>
+      <div class="reward"><i class="coin big"></i>+${WIN_COINS}</div>
+      <p>${note} You now have ${store.coins} coins.</p>`, [
+      { label: `Play level ${store.level}`, kind: "primary", onClick: () => { closeSheet(); nextLevel(); } }
+    ]), 420);
+  }
+  function nextLevel() { G = Core.makeLevel(store.level); store.game = G; between = false; history = []; save(); render(); }
+  function restart() { G = Core.makeLevel(store.level); store.game = G; history = []; save(); render(); }
+  function showMenu() {
+    const mode = store.relaxed
+      ? "Relaxed mode is on. You can keep adding cards to a set card on the board."
+      : "Classic mode is on. Once a set card caps a stack, nothing else goes on top of it.";
+    openSheet(`<h2>Level ${G.level}</h2><p>${mode} Your level and coins save on this device as you play.</p>`, [
+      { label: store.relaxed ? "Switch to Classic mode" : "Switch to Relaxed mode", kind: "secondary", onClick: () => {
+        store.relaxed = !store.relaxed; Core.setRelaxed(store.relaxed); save(); closeSheet(); render();
+        toast(store.relaxed ? "Relaxed mode on" : "Classic mode on");
+      } },
+      { label: "Restart level", kind: "secondary", onClick: () => { closeSheet(); restart(); } },
+      { label: "How to play", kind: "secondary", onClick: showHelp },
+      { label: "Reset all progress", kind: "secondary", onClick: confirmReset },
+      { label: "Close", kind: "plain", onClick: closeSheet }
+    ]);
+  }
+  function confirmReset() {
+    openSheet(`<h2>Reset everything?</h2><p>You'll go back to level 1 with ${START_COINS} coins. This can't be undone.</p>`, [
+      { label: "Reset progress", kind: "danger", onClick: () => {
+        store = { level: 1, coins: START_COINS, game: null, seenHelp: 5, relaxed: store.relaxed };
+        G = Core.makeLevel(1); store.game = G; between = false; history = [];
+        save(); closeSheet(); render(); toast("Progress reset");
+      } },
+      { label: "Cancel", kind: "plain", onClick: closeSheet }
+    ]);
+  }
+
+  /* ---------- moves ---------- */
+  function act(fn, ids) {
+    if (between) return false;
+    const snap = JSON.stringify(G);
+    const r = fn();
+    if (!r) return false;
+    if (r.short) { showShort(r.short); return false; }
+    history.push(snap);
+    if (history.length > 60) history.shift();
+    moved = new Set(ids || []);
+    if (r.slot != null) flashSlot = r.slot;
+    if (r.completed != null) toast(`${G.cats[r.completed].name} complete!`);
+    save();
+    render();
+    if (G.won) onWin();
+    else if (Core.need(G) > G.moves) setTimeout(showLost, 420);
+    return true;
+  }
+  function undo() {
+    if (between || !history.length) return;
+    if (store.coins < UNDO_COST) { toast(`Undo costs ${UNDO_COST} coins. Win a level to earn more.`); return; }
+    const prev = JSON.parse(history.pop());
+    prev.moves += G.bought - prev.bought;
+    prev.bought = G.bought;
+    G = prev; store.game = G;
+    store.coins -= UNDO_COST;
+    closeSheet(); save(); render();
+    toast(`Undone · ${UNDO_COST} coins`);
+  }
+  function tapStock() {
+    if (between) return;
+    if (!G.stock.length && G.waste.length) {
+      const after = Core.cardsLeft(G) + G.waste.length;
+      if (G.moves - 1 < after) { showRecycle(after + 1); return; }
+    }
+    if (G.moves <= 0) { showLost(); return; }
+    act(() => Core.draw(G), [G.stock.length ? G.stock[G.stock.length - 1] : -1]);
+  }
+  function groupIds(gr) { return gr.ids.concat(gr.held || []); }
+  function tapGroup(gr) {
+    const si = Core.slotFor(G, gr);
+    if (si >= 0) { act(() => Core.toSlot(G, gr, si)); return; }
+    const ci = Core.colForTap(G, gr);
+    if (ci >= 0) { act(() => Core.toCol(G, gr, ci), groupIds(gr)); return; }
+    nudge(gr.src);
+    toast(gr.base
+      ? "No open slot. Drag it onto its cards to cap the stack, or into an empty column."
+      : "Its set isn't open yet. Drag it to an empty column to dig.");
+  }
+  function parseSrc(s) {
+    if (s === "waste") return { t: "waste" };
+    const p = s.split(":");
+    return { t: "col", i: +p[1], j: +p[2] };
+  }
+
+  /* ---------- drag and drop ---------- */
+  let drag = null;
+  const ghost = $("#ghost");
+
+  function liftedEls(src) {
+    if (src.t === "waste") return [...document.querySelectorAll(`#waste [data-src="waste"]`)];
+    return [...document.querySelectorAll(`#tableau [data-ci="${src.i}"][data-src]`)].filter(el => +el.dataset.j >= src.j);
+  }
+  function targetsFor(gr) {
+    const cols = G.cols.map((_, i) => Core.canCol(G, gr, i));
+    const slots = G.slots.map((_, i) => Core.canSlot(G, gr, i));
+    return { cols, slots };
+  }
+  function startDrag(d) {
+    d.started = true;
+    d.els = liftedEls(d.grp.src);
+    if (!d.els.length) return;
+    const rects = d.els.map(el => el.getBoundingClientRect());
+    const top = Math.min(...rects.map(r => r.top));
+    const left = rects[0].left;
+    ghost.innerHTML = "";
+    d.els.forEach((el, i) => {
+      const w = document.createElement("div");
+      w.className = "gc";
+      w.style.top = (rects[i].top - top) + "px";
+      w.style.width = rects[i].width + "px";
+      const c = el.cloneNode(true);
+      c.classList.remove("arrive", "nudge");
+      w.appendChild(c);
+      ghost.appendChild(w);
+    });
+    d.offX = d.x0 - left; d.offY = d.y0 - top;
+    d.els.forEach(el => el.classList.add("lifted"));
+    ghost.hidden = false;
+    d.t = targetsFor(d.grp);
+    document.querySelectorAll("#tableau [data-col]").forEach(el => el.classList.toggle("ok", !!d.t.cols[+el.dataset.col]));
+    document.querySelectorAll("#slots [data-slot]").forEach(el => el.classList.toggle("ok", !!d.t.slots[+el.dataset.slot]));
+  }
+  function moveGhost(d, x, y) { ghost.style.transform = `translate(${x - d.offX}px, ${y - d.offY}px) scale(1.04)`; }
+  function hit(d, x, y) {
+    const points = [[x, y], [x - d.offX + dims.cw / 2, y - d.offY + 12], [x - d.offX + dims.cw / 2, y - d.offY + dims.ch / 2]];
+    for (const [px, py] of points) {
+      const el = document.elementFromPoint(px, py);
+      if (!el) continue;
+      const s = el.closest("[data-slot]");
+      if (s && d.t.slots[+s.dataset.slot]) return { el: s, slot: +s.dataset.slot };
+      const c = el.closest("[data-col]");
+      if (c && d.t.cols[+c.dataset.col]) return { el: c, col: +c.dataset.col };
+    }
+    return null;
+  }
+  function clearMarks() {
+    document.querySelectorAll(".ok, .hot").forEach(el => el.classList.remove("ok", "hot"));
+    ghost.hidden = true;
+    ghost.innerHTML = "";
+  }
+
+  $("#app").addEventListener("pointerdown", e => {
+    if (between || drag || (e.pointerType === "mouse" && e.button !== 0)) return;
+    const el = e.target.closest("[data-src]");
+    if (!el) return;
+    const grp = Core.group(G, parseSrc(el.dataset.src));
+    if (!grp) return;
+    drag = { grp, x0: e.clientX, y0: e.clientY, pid: e.pointerId, started: false, hot: null };
+  });
+  window.addEventListener("pointermove", e => {
+    if (!drag || e.pointerId !== drag.pid) return;
+    const dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
+    if (!drag.started) {
+      if (dx * dx + dy * dy < 64) return;
+      startDrag(drag);
+    }
+    e.preventDefault();
+    moveGhost(drag, e.clientX, e.clientY);
+    const h = hit(drag, e.clientX, e.clientY);
+    if (drag.hot && (!h || drag.hot.el !== h.el)) drag.hot.el.classList.remove("hot");
+    if (h) h.el.classList.add("hot");
+    drag.hot = h;
+  }, { passive: false });
+  window.addEventListener("pointerup", e => {
+    if (!drag || e.pointerId !== drag.pid) return;
+    const d = drag; drag = null;
+    if (!d.started) { tapGroup(d.grp); return; }
+    const h = hit(d, e.clientX, e.clientY);
+    clearMarks();
+    let ok = false;
+    if (h && h.slot != null) ok = act(() => Core.toSlot(G, d.grp, h.slot));
+    else if (h && h.col != null) ok = act(() => Core.toCol(G, d.grp, h.col), groupIds(d.grp));
+    if (!ok) render();
+  });
+  window.addEventListener("pointercancel", () => { if (drag) { drag = null; clearMarks(); render(); } });
+
+  $("#app").addEventListener("click", e => {
+    if (e.target.closest("#menuBtn")) { showMenu(); return; }
+    if (between) return;
+    if (e.target.closest("#stock")) {
+      tapStock();
+    }
+  });
+
+  $("#undoBtn").addEventListener("click", undo);
+
+  let rt = null;
+  window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { if (!drag) render(); }, 80); });
+
+  render();
+  if (store.seenHelp !== 5) { store.seenHelp = 5; save(); showHelp(); }
+  else if (!G.won && Core.need(G) > G.moves) showLost();
+})();
+</script>
+<script>
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+}
+</script>
+</body>
+</html>
